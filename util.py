@@ -25,17 +25,7 @@ log = logging.getLogger("bot")
 
 
 def solve_filepath(path):
-    if not path:
-        return ''
-
-    if path[0] == '/':
-        return path
-    elif os.path.exists(path):
-        return path
-    else:
-        mydir = os.path.dirname(os.path.realpath(__file__))
-        return mydir + '/' + path
-
+    return path
 
 def get_recursive_file_list_sorted(path):
     filelist = []
@@ -133,34 +123,8 @@ def check_update(current_version):
 
 
 def update(current_version):
+    return "Updates are disabled"
     global log
-
-    target = var.config.get('bot', 'target_version')
-    new_version = new_release_version(target)
-    msg = ""
-    if target == "git":
-        msg = "git install, I do nothing<br/>"
-
-    elif (target == "stable" and version.parse(new_version) > version.parse(current_version)) or \
-            (target == "testing" and version.parse(new_version) != version.parse(current_version)):
-        log.info('update: new version, start updating...')
-        tp = sp.check_output(['/usr/bin/env', 'bash', 'update.sh', target]).decode()
-        log.debug(tp)
-        log.info('update: update pip libraries dependencies')
-        sp.check_output([var.config.get('bot', 'pip3_path'), 'install', '--upgrade', '-r', 'requirements.txt']).decode()
-        msg = "New version installed, please restart the bot.<br/>"
-
-    log.info(f'update: starting update {YT_PKG_NAME} via pip3')
-    tp = sp.check_output([var.config.get('bot', 'pip3_path'), 'install', '--upgrade', YT_PKG_NAME]).decode()
-    if f"Collecting {YT_PKG_NAME}" in tp.splitlines():
-        msg += "Update done: " + tp.split('Successfully installed')[1]
-    else:
-        msg += YT_PKG_NAME.capitalize() + " is up-to-date"
-
-    reload(youtube_dl)
-    msg += "<br/>" + YT_PKG_NAME.capitalize() + " reloaded"
-    return msg
-
 
 def pipe_no_wait():
     """ Generate a non-block pipe used to fetch the STDERR of ffmpeg.
